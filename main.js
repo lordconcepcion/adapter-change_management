@@ -115,7 +115,7 @@ healthcheck(callback) {
       * for the callback's errorMessage parameter.
       */
         this.emitOffline();
-        log.error(`ServiceNow: Instance is unavailable.  ID: ${JSON.stringify(error)}`);
+        log.error(`ServiceNow: healthcheck Error ID: ${JSON.stringify(error)}`);
         if( callback ) {
             callback(error);
         }
@@ -133,7 +133,7 @@ healthcheck(callback) {
       * responseData parameter.
       */
         this.emitOnline()
-        log.debug(`ServiceNow: Instance is available.  ID: ${JSON.stringify(result)}`);
+        log.debug(`ServiceNow: healthcheck successful.  ID: ${JSON.stringify(result)}`);
         if( callback ) {
             callback(result);
         }
