@@ -83,7 +83,7 @@ class ServiceNowAdapter extends EventEmitter {
     this.healthcheck();
   }
 
-  /**
+/**
  * @memberof ServiceNowAdapter
  * @method healthcheck
  * @summary Check ServiceNow Health
@@ -114,10 +114,12 @@ healthcheck(callback) {
       * healthcheck(), execute it passing the error seen as an argument
       * for the callback's errorMessage parameter.
       */
-      
-      this.connector.emitOffline();
-      log.error( this.id + ' :: ServiceNow Adapter - LORD :: ${JSON.stringify(error)}' );
-      callback( error );
+        this.emitOffline();
+        log.error(`ServiceNow: Instance is unavailable.  ID: ${JSON.stringify(error)}`);
+        if( callback ) {
+            callback(error);
+        }
+        return error;
 
    } else {
      /**
@@ -130,10 +132,12 @@ healthcheck(callback) {
       * parameter as an argument for the callback function's
       * responseData parameter.
       */
-      
-      this.connector.emitOnline();
-      log.debug( this.id + ':: HealthStatus OK :: ServiceNow Adapter - LORD :: ${JSON.stringify(result)}');
-      callback(result);
+        this.emitOnline()
+        log.debug(`ServiceNow: Instance is available.  ID: ${JSON.stringify(result)}`);
+        if( callback ) {
+            callback(result);
+        }
+        return result;
    }
  });
 }
@@ -147,7 +151,8 @@ healthcheck(callback) {
    */
   emitOffline() {
     this.emitStatus('OFFLINE');
-    log.warn('ServiceNow: Instance is unavailable.');
+    // log.warn('ServiceNow: Instance is unavailable.');
+    log.error(`ServiceNow: Instance is unavailable.  ID: ${this.id}`);
   }
 
   /**
@@ -159,7 +164,7 @@ healthcheck(callback) {
    */
   emitOnline() {
     this.emitStatus('ONLINE');
-    log.info('ServiceNow: Instance is available.');
+    log.info(`ServiceNow: Instance is available.  ID: ${this.id}`);
   }
 
   /**
@@ -191,15 +196,14 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-
-    this.connector.get( (data, error) => {
-            if (error) {
-                console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
-            }
-            console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
-    });
-
-  }
+      this.connector.get((data, error) => {
+        if (error) {
+          return callback(error);
+        }     
+        return callback(data);
+      });
+    }    
+    
 
   /**
    * @memberof ServiceNowAdapter
@@ -217,15 +221,14 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * post() takes a callback function.
      */
+      this.post((data, error) => {
+          if (error) {
+            return callback(error);
+          }
+          return callback(data);
+        });    
+    }
 
-        this.connector.post( (data, error) => {
-                if (error) {
-                    console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
-                }
-                console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
-        });
 
-  }
 }
-
 module.exports = ServiceNowAdapter;
