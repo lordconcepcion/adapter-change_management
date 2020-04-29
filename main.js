@@ -115,9 +115,9 @@ healthcheck(callback) {
       * for the callback's errorMessage parameter.
       */
         this.emitOffline();
-        log.error(`ServiceNow: healthcheck Error ID: ${JSON.stringify(error)}`);
+        log.error(`ServiceNow: healthcheck Error - ID: ${this.id} ${JSON.stringify(error)}`);
         if( callback ) {
-            callback(error);
+            callback(null, error);
         }
         return error;
 
@@ -133,9 +133,9 @@ healthcheck(callback) {
       * responseData parameter.
       */
         this.emitOnline()
-        log.debug(`ServiceNow: healthcheck successful.  ID: ${JSON.stringify(result)}`);
+        log.debug(`ServiceNow: healthcheck successful - ID: ${this.id} Error: ${JSON.stringify(result)}`);
         if( callback ) {
-            callback(result);
+            callback(result, null);
         }
         return result;
    }
@@ -151,7 +151,6 @@ healthcheck(callback) {
    */
   emitOffline() {
     this.emitStatus('OFFLINE');
-    // log.warn('ServiceNow: Instance is unavailable.');
     log.error(`ServiceNow: Instance is unavailable.  ID: ${this.id}`);
   }
 
@@ -198,9 +197,9 @@ healthcheck(callback) {
      */
       this.connector.get((data, error) => {
         if (error) {
-          return callback(error);
+          return callback(null, error);
         }     
-        return callback(data);
+        return callback(data, null );
       });
     }    
     
@@ -223,9 +222,9 @@ healthcheck(callback) {
      */
       this.post((data, error) => {
           if (error) {
-            return callback(error);
+            return callback(null, error);
           }
-          return callback(data);
+          return callback(data, null);
         });    
     }
 
