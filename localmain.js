@@ -67,11 +67,20 @@ class ServiceNowAdapter extends EventEmitter {
     //    password: '1Drls4HtxSRU'
     //};
 
-    this.connector = new ServiceNowConnector({
+    /* this.connector = new ServiceNowConnector({
       url: this.props.url,
       username: this.props.auth.username,
       password: this.props.auth.password,
       serviceNowTable: this.props.serviceNowTable
+    }); */
+
+
+
+    this.connector = new ServiceNowConnector({
+      url: 'https://dev70735.service-now.com/',
+      username: 'admin',
+      password: '1Drls4HtxSRU',
+      serviceNowTable: 'change_request'
     });
 
 
@@ -254,7 +263,7 @@ healthcheck(callback) {
                 callback(data, error);
             } 
             else {
-               if ( data.hasOwnProperty('body') ) {
+               /* if ( data.hasOwnProperty('body') ) {
                     var data_body = (JSON.parse(data.body).result);
                     
                     var changeTicket = {};
@@ -267,7 +276,18 @@ healthcheck(callback) {
                                         "change_ticket_key" : data_body.sys_id
                                     });
                     callback( changeTicket, error); 
-                }
+                } */
+                if (data.hasOwnProperty('body')) {
+                    var changeTicket = {};
+                    var result_array = (JSON.parse(data.body).result);
+                    changeTicket = ({"change_ticket_number" : result_array.number, "active" : result_array.active, "priority" : result_array.priority,
+                                   "description" : result_array.description, "work_start" : result_array.work_start, "work_end" : result_array.work_end,
+                                   "change_ticket_key" : result_array.sys_id});
+                    callback(changeTicket, error); 
+                 } 
+
+
+
 
             }          
         });
@@ -275,3 +295,30 @@ healthcheck(callback) {
 
 }
 module.exports = ServiceNowAdapter;
+
+function main(){
+    console.log(`\nFrom main() function`);
+    var test_ServiceNowAdapter = new ServiceNowAdapter();
+    // test_ServiceNowAdapter.getRecord();
+    // test_ServiceNowAdapter.connect();
+    //console.log(`\ntest_ServiceNowAdapter.connect() Complete`); 
+
+    
+    test_ServiceNowAdapter.getRecord( (data, error) => {
+        console.log(`\nResponse returned from GET data JSON.stringify request:${JSON.stringify(data)}`);
+        console.log(`\nResponse returned from GET error JSON.stringify request:${JSON.stringify(error)}`);
+    // console.log(`\nResponse returned from GET JSON.parse request:${data}`);
+    //console.log(`Change Ticket: ${data[0].change_ticket_number}`);
+
+    });
+
+    
+    test_ServiceNowAdapter.postRecord( (data, error) => {
+            console.log(`\nResponse returned from POST data JSON.stringify request:${JSON.stringify(data)}`);
+            console.log(`\nResponse returned from POST error JSON.stringify request:${JSON.stringify(error)}`);
+
+    }); 
+
+
+}
+main();

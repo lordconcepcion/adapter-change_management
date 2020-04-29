@@ -60,21 +60,12 @@ class ServiceNowAdapter extends EventEmitter {
     this.id = id;
     this.props = adapterProperties;
     // Instantiate an object from the connector.js module and assign it to an object property.
-
-    //const options = {
-    //    url: 'https://dev70735.service-now.com/',
-    //    username: 'admin',
-    //    password: '1Drls4HtxSRU'
-    //};
-
     this.connector = new ServiceNowConnector({
       url: this.props.url,
       username: this.props.auth.username,
       password: this.props.auth.password,
       serviceNowTable: this.props.serviceNowTable
     });
-
-
   }
 
   /**
@@ -128,7 +119,7 @@ healthcheck(callback) {
         if( callback ) {
             callback(null, error);
         }
-        //return error;
+        return error;
 
    } else {
      /**
@@ -146,7 +137,7 @@ healthcheck(callback) {
         if( callback ) {
             callback(result, null);
         }
-        //return result;
+        return result;
    }
  });
 }
@@ -204,31 +195,12 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-        this.connector.get((data, error) => {
-            if (error) {
-                callback(null, error);
-            }     
-            else {
-                if (data.hasOwnProperty('body')) {
-                    var data_body = (JSON.parse(data.body));
-                    var body_count = data_body.result.length;
-                    var changeTicket = [];
-
-                    for(var index = 0; index < body_count; index += 1) {
-                        var singleChangeTicket = (JSON.parse(data.body).result);
-                        changeTicket.push({ "change_ticket_number" : singleChangeTicket[index].number, 
-                                        "active" : singleChangeTicket[index].active, 
-                                        "priority" : singleChangeTicket[index].priority,
-                                        "description" : singleChangeTicket[index].description, 
-                                        "work_start" : singleChangeTicket[index].work_start, 
-                                        "work_end" : singleChangeTicket[index].work_end,
-                                        "change_ticket_key" : singleChangeTicket[index].sys_id
-                                        });
-                    } 
-                callback(changeTicket, error); 
-                }
-            } 
-        });
+      this.connector.get((data, error) => {
+        if (error) {
+          return callback(null, error);
+        }     
+        return callback(data, null );
+      });
     }    
     
 
@@ -248,30 +220,14 @@ healthcheck(callback) {
      * Note how the object was instantiated in the constructor().
      * post() takes a callback function.
      */
-    this.connector.post((data, error) => {
-            if (error) {
-                //console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
-                callback(data, error);
-            } 
-            else {
-               if ( data.hasOwnProperty('body') ) {
-                    var data_body = (JSON.parse(data.body).result);
-                    
-                    var changeTicket = {};
-                    changeTicket = ({  "change_ticket_number" : data_body.number, 
-                                        "active" : data_body.active, 
-                                        "priority" : data_body.priority,
-                                        "description" : data_body.description,
-                                        "work_start" : data_body.work_start,
-                                        "work_end" : data_body.work_end,
-                                        "change_ticket_key" : data_body.sys_id
-                                    });
-                    callback( changeTicket, error); 
-                }
+      this.post((data, error) => {
+          if (error) {
+            return callback(null, error);
+          }
+          return callback(data, null);
+        });    
+    }
 
-            }          
-        });
-  }
 
 }
 module.exports = ServiceNowAdapter;
